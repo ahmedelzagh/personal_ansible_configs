@@ -1,0 +1,110 @@
+- name: install | zsh | package
+  tags: package,install,zsh,user
+  package:
+    name:
+      - zsh
+
+# Create my personal user group
+- name: users | aelzagh | create group
+  tags: groups,aelzagh,users
+  group:
+    name: aelzagh
+    state: present
+
+# Create/Check for my personal user, and add it to groups
+- name: users | aelzagh | create user
+  tags: aelzagh,sudo,users
+  user:
+    name: aelzagh
+    group: aelzagh
+    groups: "{{ sudo_group }}"
+    home: /home/aelzagh
+    state: present
+    comment: "Ahmed Elzagh"
+    password: "{{ aelzagh_passwd }}"
+    shell: /bin/zsh
+
+# Add my user to sudoers
+- name: users | aelzagh | add sudoers file
+  tags: aelzagh,settings,sudo,users
+  copy:
+    src: users/aelzagh/aelzagh_sudoers
+    dest: /etc/sudoers.d/aelzagh
+    owner: root
+    group: root
+    mode: 0440
+
+# Create ssh folder for my personal user
+- name: users | aelzagh | create .ssh directory
+  tags: dotfiles,aelzagh,ssh,users
+  file:
+    path: "{{ item.dir }}"
+    state: directory
+    owner: aelzagh
+    group: aelzagh
+    mode: 0700
+  with_items:
+    - { dir: '/home/aelzagh/.ssh' }
+
+- name: users | aelzagh | create directories
+  tags: dotfiles,aelzagh,ssh,users,config
+  file:
+    path: /home/aelzagh/{{ item.dir }}
+    state: directory
+    owner: aelzagh
+    group: aelzagh
+    mode: 0700
+  with_items:
+    - { dir: '.bash' }
+    - { dir: '.config' }
+    - { dir: '.config/htop' }
+    - { dir: '.zsh' }
+
+- name: users | aelzagh | add public key
+  tags: dotfiles,aelzagh,ssh,ssh-keys,users
+  authorized_key:
+    user: aelzagh
+    key: "{{ item }}"
+  with_file:
+    - users/aelzagh/ssh/aelzagh_id_ed25519.pub
+
+- name: users | aelzagh | copy dotfiles
+  tags: dotfiles,users,aelzagh,git,bash,htop,zsh
+  copy:
+    src: users/aelzagh/{{ item.src }}
+    dest: /home/aelzagh/{{ item.dest }}
+    owner: aelzagh
+    group: aelzagh
+    mode: 0600
+  with_items:
+    - { src: 'bash/bash_aliases', dest: '.bash/bash_aliases' }
+    - { src: 'bash/bash_profile', dest: '.bash_profile' }
+    - { src: 'bash/bash_prompt', dest: '.bash/bash_prompt' }
+    - { src: 'bash/bash_functions', dest: '.bash/bash_functions' }
+    - { src: 'bash/bashrc', dest: '.bashrc' }
+    - { src: 'bash/profile', dest: '.profile' }
+    - { src: 'git/gitconfig', dest: '.gitconfig' }
+    - { src: 'inputrc', dest: '.inputrc' }
+    - { src: 'htop/htoprc', dest: '.config/htop/htoprc' }
+    - { src: 'zsh/zshrc', dest: '.zshrc' }
+
+- name: users | aelzagh | copy individual zsh config files
+  tags: dotfiles,aelzagh,users,zsh
+  copy:
+    src: users/aelzagh/zsh/{{ item.src }}
+    dest: /home/aelzagh/.zsh/{{ item.src }}
+    owner: aelzagh
+    group: aelzagh
+    mode: 0600
+  with_items:
+    - { src: 'aliases.zsh' }
+    - { src: 'bindkey.zsh' }
+    - { src: 'completion.zsh' }
+    - { src: 'exports.zsh' }
+    - { src: 'functions.zsh' }
+    - { src: 'history.zsh' }
+    - { src: 'path.zsh' }
+    - { src: 'plugins.zsh' }
+    - { src: 'prompt.zsh' }
+    - { src: 'setopt.zsh' }
+    - { src: 'theming.zsh' }
