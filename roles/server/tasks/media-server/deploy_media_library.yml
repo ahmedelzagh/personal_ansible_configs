@@ -1,0 +1,98 @@
+---
+- name: Create Media Network
+  community.docker.docker_network:
+    name: media_network
+
+- name: Deploy Sonarr
+  community.docker.docker_container:
+    name: sonarr
+    image: linuxserver/sonarr:latest
+    networks:
+      - name: media_network
+    env:
+      PUID: "998"
+      PGID: "998"
+      TZ: "Africa/Cairo"
+    volumes:
+      - /home/tom/docker/sonarr/data:/config
+      - /home/tom/docker/media/tv:/tv #optional
+      - /home/tom/docker/downloads:/downloads #optional
+    ports:
+      - "8989:8989"
+    restart_policy: unless-stopped
+
+- name: Deploy Radarr
+  community.docker.docker_container:
+    name: radarr
+    image: linuxserver/radarr:latest
+    networks:
+      - name: media_network
+    env:
+      PUID: "998"
+      PGID: "998"
+      TZ: "Africa/Cairo"
+    volumes:
+      - /home/tom/docker/radarr/data:/config
+      - /home/tom/docker/media/movies:/movies #optional
+      - /home/tom/docker/downloads:/downloads #optional
+    ports:
+      - "7878:7878"
+    restart_policy: unless-stopped
+
+- name: Deploy qbittorrent
+  community.docker.docker_container:
+    name: qbittorrent
+    image: linuxserver/qbittorrent:latest
+    networks:
+      - name: media_network
+    env:
+      PUID: "998"
+      PGID: "998"
+      TZ: "Africa/Cairo"
+      WEBUI_PORT: "8080"
+    volumes:
+      - /home/tom/docker/qbittorrent/data:/config
+      - /home/tom/docker/downloads:/downloads
+    ports:
+      - "8080:8080"
+      - "6881:6881"
+      - "6881:6881/udp"
+    restart_policy: unless-stopped
+
+- name: Deploy Jackett
+  community.docker.docker_container:
+    name: jackett
+    image: linuxserver/jackett:latest
+    networks:
+      - name: media_network
+    env:
+      PUID: "998"
+      PGID: "998"
+      TZ: "Africa/Cairo"
+    volumes:
+      - /home/tom/docker/jackett/data:/config
+      - /home/tom/docker/downloads:/downloads
+    ports:
+      - "9117:9117"
+    restart_policy: unless-stopped
+
+- name: Deploy jellyfin
+  community.docker.docker_container:
+    name: jellyfin
+    image: linuxserver/jellyfin:latest
+    networks:
+      - name: media_network
+    env:
+      PUID: "998"
+      PGID: "998"
+      TZ: "Africa/Cairo"
+    volumes:
+      - /home/tom/docker/jellyfin/data:/config
+      - /home/tom/docker/media/tv:/data/tvshows
+      - /home/tom/docker/media/movies:/data/movies
+    ports:
+      - "8096:8096"
+      - "8920:8920" #optional
+      - "7359:7359/udp" #optional
+      - "1900:1900/udp" #optional
+    restart_policy: unless-stopped

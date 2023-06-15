@@ -1,0 +1,6 @@
+---
+- block:
+  - import_tasks: docker/install_docker.yml
+  - import_tasks: docker/deploy_portainer.yml
+  - import_tasks: media-server/deploy_media_library.yml
+  - import_tasks: media-server/copy_media_configs.yml

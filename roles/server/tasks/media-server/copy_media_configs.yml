@@ -1,0 +1,7 @@
+---
+- name: unarchive media configs
+  unarchive:
+    src: media/media_configs.tar.gz
+    dest: /home/tom/docker
+    owner: tom
+    group: tom
