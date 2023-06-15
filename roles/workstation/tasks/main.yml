@@ -1,0 +1,20 @@
+- name: pull | my Git repositories
+  tags: git,users,aelzagh
+  become_user: aelzagh
+  git:
+    repo: "{{ item.repo }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { repo: 'https://github.com/ahmedelzagh/cheat-sheets.git', dest: '/home/aelzagh/Github/cheat-sheets' }
+    - { repo: 'https://github.com/ahmedelzagh/Boilerplates.git', dest: '/home/aelzagh/Github/Boilerplates' }
+    - { repo: 'https://github.com/ahmedelzagh/ansible-desktop-configs.git', dest: '/home/aelzagh/Github/ansible-desktop-configs' }
+
+- name: give | permissions | aelzagh | repos
+  tags: git,permission,aelzagh,users
+  file:
+    path: "{{item.path}}"
+    owner: aelzagh
+    group: aelzagh
+    recurse: true
+  with_items:
+    - { path: '/home/aelzagh/Github' }
