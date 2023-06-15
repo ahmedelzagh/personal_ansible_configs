@@ -1,0 +1,40 @@
+- hosts: all
+  become: true
+  pre_tasks:
+
+    - name: install | updates (fedora)
+      tags: always
+      dnf:
+        update_cache: yes
+        update_only: yes
+      when: ansible_distribution == "Fedora"
+
+    - name: install | updates (debian, etc)
+      tags: always
+      apt:
+        update_cache: yes
+        upgrade: dist
+      changed_when: False
+      when: ansible_os_family == "Debian"
+
+    - name: create | Ansible | user
+      tags: always
+      user:
+        name: tom
+        groups: root
+        system: true
+
+    - name: add | ssh key | for user tom
+      tags: always
+      authorized_key:
+        user: tom
+        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKdYcs9HIBhJZObpxdF3sStWnDFRbEmFSb2avCRr8CMO ubuntu main key"
+
+    - name: add | sudoers file | user tom
+      tags: always
+      copy:
+        src: roles/base/files/users/tom/tom_sudoers
+        dest: /etc/sudoers.d/tom
+        owner: root
+        group: root
+        mode: 0440
