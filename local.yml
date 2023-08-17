@@ -18,13 +18,16 @@
       changed_when: False
       when: ansible_os_family == "Debian"
 
-- hosts: cloud
-  tags: cloud
-  roles:
-    - server
+# - hosts: all
+#   tags: base
+#   become: true
+#   roles:
+#     - base
 
-- hosts: all
-  tags: base
+- hosts: servers
+  vars:
+    ansible_user: tom
+  tags: server
   become: true
   roles:
-    - base
+    - server

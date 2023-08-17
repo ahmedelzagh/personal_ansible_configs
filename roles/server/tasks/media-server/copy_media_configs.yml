@@ -1,7 +1,20 @@
 ---
 - name: unarchive media configs
   unarchive:
-    src: media/media_configs.tar.gz
-    dest: /home/tom/docker
-    owner: tom
-    group: tom
+    src: media/media_configs.tar.xz
+    dest: /home/{{ ansible_user }}/docker
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+
+- name: set permissions to ansible user
+  file:
+    path: /home/{{ ansible_user }}/docker
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    recurse: yes
+  notify:
+    - restart_sonarr
+    - restart_radarr
+    - restart_qbittorrent
+    - restart_jackett
+    - restart_jellfin

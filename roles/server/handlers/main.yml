@@ -1,0 +1,36 @@
+---
+- name: restart_sonarr
+  community.docker.docker_container:
+    name: sonarr
+    image: linuxserver/sonarr:latest
+    state: started
+    restart: true
+
+- name: restart_radarr
+  community.docker.docker_container:
+    name: radarr
+    image: linuxserver/radarr:latest
+    state: started
+    restart: true
+
+- name: restart_qbittorrent
+  community.docker.docker_container:
+    name: qbittorrent
+    image: linuxserver/qbittorrent:latest
+    state: started
+    restart: true
+
+- name: restart_jackett
+  community.docker.docker_container:
+    name: jackett
+    image: linuxserver/jackett:latest
+    state: started
+    restart: true
+
+- name: restart_jellfin
+  community.docker.docker_container:
+    name: jellyfin
+    image: linuxserver/jellyfin:latest
+    state: started
+    restart: true
+

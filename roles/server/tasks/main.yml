@@ -1,6 +1,12 @@
 ---
-- block:
-  - import_tasks: docker/install_docker.yml
-  - import_tasks: docker/deploy_portainer.yml
-  - import_tasks: media-server/deploy_media_library.yml
-  - import_tasks: media-server/copy_media_configs.yml
+- name: Install Docker
+  import_tasks: docker/install_docker.yml
+
+- name: Deploy Containers
+  become_user: "{{ ansible_user }}"
+  block:
+    - import_tasks: docker/deploy_portainer.yml
+    - import_tasks: media-server/deploy_media_library.yml
+
+- name: Copy Configs
+  import_tasks: media-server/copy_media_configs.yml
